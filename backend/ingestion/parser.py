@@ -1,12 +1,11 @@
 import re
 
 def parse_log_line(line):
-    log_pattern = r'^(?P<timestamp>\S+ \S+) (?P<level>\S+) (?P<service>\S+) (?P<message>.+)$'
+    log_pattern = r'^(?P<timestamp>[^,]+),(?P<level>[^,]+),(?P<service>[^,]+),(?P<message>.+)$'
     match = re.match(log_pattern, line)
     if match:
         return match.groupdict()
-    else:
-        return None
+    return None
     
     # groupdict() -> convert raw data into structure data (dictionary)
     # r'' -> raw Data

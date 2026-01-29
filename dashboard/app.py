@@ -1,11 +1,11 @@
 import streamlit as st
 from backend.processing.pipeline import build_pipeline
-from backend.anomaly.detecter import detect_anomaly
+from backend.anomaly.detector import detect_anomaly
 import plotly as px
 
 
 st.title("Python Based High Throughput Log Analytics Monitoring Engine")
-log_df=build_pipeline(r"data/sample_log.log")
+log_df=build_pipeline(r"realtime_logs.csv")
 anomaly_df=detect_anomaly(log_df).compute()
 print(anomaly_df)
 

@@ -17,12 +17,12 @@ def main():
     start = time.time()
 
     # Build log processing pipeline
-    log_df = build_pipeline("backend/logs_generator/realtime_logs.csv")
+    log_df = build_pipeline(r"realtime_logs.csv")
 
     total_logs = log_df.count().compute()
     end = time.time()
 
-    print("Total logs parsed:", total_logs)
+    print("Total logs parsed: \n", total_logs)
     print("Time taken:", round(end - start, 2), "seconds")
 
     print("\n Running anomaly detection...")

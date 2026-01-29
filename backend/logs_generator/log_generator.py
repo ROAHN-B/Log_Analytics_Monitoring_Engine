@@ -12,7 +12,6 @@ error_msgs = ["DB failure", "Timeout", "Null pointer"]
 # Write header once
 with open(LOG_FILE, "w", newline="") as f:
     writer = csv.writer(f)
-    writer.writerow(["timestamp", "level", "service", "message"])
 
 print(" Real-time log producer started...")
 
