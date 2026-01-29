@@ -1,4 +1,3 @@
-timestamp,level,service,message
 2026-01-29T19:44:53.185694,INFO,auth,Request OK
 2026-01-29T19:44:53.386844,INFO,orders,Request OK
 2026-01-29T19:44:53.589375,INFO,search,Cache hit

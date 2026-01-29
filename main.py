@@ -1,11 +1,11 @@
-from backend.confg.dask_config import start_dask
+from backend.config.dask_config import start_dask
 from backend.processing.pipeline import build_pipeline
 from backend.anomaly.detector import detect_anomaly
-from backend.config.email_config import send_anomaly_email
+from backend.config.email_config import send_mail
 import time
 
 
-ADMIN_EMAIL = "rohanbelsare113@gmail.com" 
+ADMIN_EMAIL = "rohanbelsare113@gmail.com"
 
 
 def main():
@@ -17,7 +17,7 @@ def main():
     start = time.time()
 
     # Build log processing pipeline
-    log_df = build_pipeline("realtime_logs.csv")
+    log_df = build_pipeline("backend/logs_generator/realtime_logs.csv")
 
     total_logs = log_df.count().compute()
     end = time.time()
@@ -42,13 +42,10 @@ def main():
             anomaly_data = {
                 "timestamp": row["timestamp"],
                 "error_count": row["error_count"],
-                "z_score": row["z_score"]
+                "z_score": row["z_score"],
             }
 
-            send_anomaly_email(
-                to_email=ADMIN_EMAIL,
-                anomaly=anomaly_data
-            )
+            send_mail(to_email=ADMIN_EMAIL, anomaly=anomaly_data)
 
             print(
                 f"📧 Alert sent | Time: {row['timestamp']} | "

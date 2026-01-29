@@ -1,7 +1,7 @@
 # Used for structuring and executing the data processing pipeline
 import dask.dataframe as dd
-from ingestion.loader import load_logs
-from ingestion.parser import parse_log_line
+from backend.ingestion.loader import load_logs
+from backend.ingestion.parser import parse_log_line
 
 
 def build_pipeline(file_path):
