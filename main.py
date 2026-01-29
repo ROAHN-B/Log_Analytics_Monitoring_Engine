@@ -17,7 +17,7 @@ def main():
     start = time.time()
 
     # Build log processing pipeline
-    log_df = build_pipeline("log_generater/realtime_logs.csv")
+    log_df = build_pipeline("realtime_logs.csv")
 
     total_logs = log_df.count().compute()
     end = time.time()
