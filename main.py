@@ -45,7 +45,7 @@ def main():
                 "z_score": row["z_score"],
             }
 
-            send_mail(to_email=ADMIN_EMAIL, anomaly=anomaly_data)
+            send_mail(to_mail=ADMIN_EMAIL, anomaly=anomaly_data)
 
             print(
                 f"📧 Alert sent | Time: {row['timestamp']} | "
