@@ -35,28 +35,24 @@ import dask.dataframe as dd
 
 
 def detect_anomaly(log_df, z_threshold=3):
-    # Filter ERROR logs
     error_logs = log_df[log_df["level"] == "ERROR"]
-
-    # IMPORTANT: set index with sorted=True
     error_pd = error_logs.compute().sort_values("timestamp").set_index("timestamp")
-
-    # Resample safely
     error_counts = error_pd.resample("1min").size().rename("error_count").reset_index()
 
-    # Compute statistics
     mean = error_counts["error_count"].mean()
     std = error_counts["error_count"].std(ddof=0)
-    print(mean)
-    print(std)
 
+    
     if std == 0:
+        if mean > 0:
+            
+            error_counts["z_score"] = 0 
+            error_counts["is_anomaly"] = True 
+            return error_counts
         return error_counts.head(0)
 
     error_counts["z_score"] = (error_counts["error_count"] - mean) / std
     error_counts["is_anomaly"] = error_counts["z_score"].abs() > z_threshold
 
     return error_counts[error_counts["is_anomaly"]]
-
-
 
