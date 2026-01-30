@@ -10,9 +10,12 @@ ADMIN_EMAIL = "rohanbelsare113@gmail.com"
 
 def main():
     client = start_dask()
-    print(client)
-    print(f"Dashboard link: {client.dashboard_link}")
-    print("\n" + "=" * 50)
+    if client:
+        print(client)
+        print(f"Dashboard link: {client.dashboard_link}")
+        print("\n" + "=" * 50)
+    else:
+        print("Running in synchronous mode (No Dask Client).")
 
     start = time.time()
 
