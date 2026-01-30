@@ -31,10 +31,12 @@ step 6 : Delect anamoly
 step 7 : return anamoly"""
 
 import dask.dataframe as dd
+import os
 
 
 
 def detect_anomaly(log_df, z_threshold=3):
+    scheduler_type = 'synchronous' if os.environ.get('RENDER') else None
     error_logs = log_df[log_df["level"] == "ERROR"]
     error_pd = error_logs.compute().sort_values("timestamp").set_index("timestamp")
     error_counts = error_pd.resample("1min").size().rename("error_count").reset_index()
