@@ -6,8 +6,6 @@ import os
 
 def start_dask():
     if os.environ.get('RENDER'):
-        # On Render, we return None or a 'dummy' client 
-        # to force Dask to use the single-threaded scheduler
         return None
     cluster = LocalCluster(
         n_workers=2, threads_per_worker=3, memory_limit="256MB", dashboard_address=":8790"
