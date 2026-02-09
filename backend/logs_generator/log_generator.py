@@ -9,17 +9,25 @@ services = ["auth", "payment", "orders", "search"]
 info_msgs = ["Request OK", "User login", "Cache hit"]
 error_msgs = ["DB failure", "Timeout", "Null pointer"]
 
-# Write header once
+# CRITICAL FIX: Write the header names
 with open(LOG_FILE, "w", newline="") as f:
     writer = csv.writer(f)
 
-print(" Real-time log producer started...")
+print("Real-time log producer started with Anomaly Phases...")
+START_TIME = time.time()
 
 while True:
-    level = random.choices(
-        ["INFO", "WARN", "ERROR"],
-        weights=[0.8, 0.1, 0.1],
-    )[0]
+    elapsed = time.time() - START_TIME
+    
+    # Simulate a "Burst" every 60 seconds for 10 seconds
+    is_burst = 60 < (elapsed % 70) < 70
+    
+    if is_burst:
+        level = random.choices(["INFO", "WARN", "ERROR"], weights=[0.1, 0.1, 0.8])[0]
+        sleep_duration = 0.05 # Fast errors!
+    else:
+        level = random.choices(["INFO", "WARN", "ERROR"], weights=[0.85, 0.1, 0.05])[0]
+        sleep_duration = 0.2
 
     row = [
         datetime.now().isoformat(),
@@ -31,4 +39,4 @@ while True:
     with open(LOG_FILE, "a", newline="") as f:
         csv.writer(f).writerow(row)
 
-    time.sleep(0.2)  # 5 logs per second
+    time.sleep(sleep_duration)

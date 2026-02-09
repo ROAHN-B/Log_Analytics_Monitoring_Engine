@@ -1,70 +1,57 @@
-from backend.config.dask_config import start_dask
-from backend.processing.pipeline import build_pipeline
-from backend.anomaly.detector import detect_anomaly
-from backend.config.email_config import send_mail
 import time
-import pandas 
+import dask.dataframe as dd
+    
+from backend.config.dask_config import start_dask
+from backend.ingestion.loader import load_logs
+from backend.ingestion.parser import parse_log_line
+from backend.processing.pipeline import build_pipeline
+from backend.config.email_config import send_mail
+from backend.anomaly.detector import detect_anomaly
 
-
-ADMIN_EMAIL = "rohanbelsare113@gmail.com"
-
-
+user_mail="rohanbelsare113@gmail.com"
 def main():
+    # Start Dask client
     client = start_dask()
-    if client:
-        print(client)
-        print(f"Dashboard link: {client.dashboard_link}")
-        print("\n" + "=" * 50)
-    else:
-        print("Running in synchronous mode (No Dask Client).")
-
-    
+    print(client)
+    print(f"Dashboard link: {client.dashboard_link}")
+    print("-" * 50)
     while True:
-        start = time.time()
-        # Build log processing pipeline
-        log_df = build_pipeline(r"realtime_logs.csv")
-
+        start_time = time.time()
+        #log_df = build_pipeline("backend/logs/sample_log.log")
+        log_df = build_pipeline("realtime_logs.csv")
         total_logs = log_df.count().compute()
-        end = time.time()
 
-        print("Total logs parsed: \n", total_logs)
-        print("Time taken:", round(end - start, 2), "seconds")
-
-        print("\n Running anomaly detection...")
-
-        # Detect anomalies
+        end_time = time.time()
         anomalies_df = detect_anomaly(log_df)
+        print(anomalies_df)
 
-        # anomalies = anomalies_df.compute()
-        anomalies = anomalies_df[anomalies_df["z_score"].notna()&(anomalies_df["z_score"]!=0)]
+        anomalies = anomalies_df[anomalies_df["is_anomaly"] == True]
 
-        if anomalies.empty:
-            print("No anomalies detected")
-            time.sleep(60)
-            continue
+        if anomalies.shape[0] == 0:
+            print("No anomalies detected.")
         else:
-            print(f"🚨 {len(anomalies)} anomaly windows detected!")
-
-        row = anomalies.sort_values(
-                "z_score", key=abs, ascending=False
-            ).iloc[0]
-
-        anomaly_data = {
-                "timestamp": row["timestamp"],
-                "error_count": int(row["error_count"]),
-                "z_score": round(float(row["z_score"]), 2),
-            }
-
-        send_mail(to_mail=ADMIN_EMAIL, anomaly=anomaly_data)
+            print(f"{anomalies.shape[0]} Anomalies detected:")
         
-        print(
-                f"📧 Alert sent | Time: {row['timestamp']} | "
-                f"Errors: {row['error_count']} | "
-                f"Z-score: {round(row['z_score'], 2)}"
+        for _, row in anomalies.iterrows():
+            anomaly_data={
+                "timestamp": row['minute'],
+                "error_count": row['error_count'],
+                "z_score": row['z_score']
+            }
+            send_mail(
+                to_mail=user_mail,
+                anomaly=anomaly_data
             )
-        time.sleep(60)
-    
+        print("Anomaly Detected")
 
+        
+
+        print("Total logs parsed:")
+        print(total_logs)
+        print("Time taken:", end_time - start_time)
+        time.sleep(5)
+
+        
 
 if __name__ == "__main__":
     main()

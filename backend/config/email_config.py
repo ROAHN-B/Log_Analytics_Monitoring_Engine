@@ -8,17 +8,25 @@ SMTP_SERVER="smtp.gmail.com"
 SMTP_PORT=465
 
 def send_mail(to_mail:str,anomaly:dict):
-    subject="Log anomaly detected"
+    subject=f"[ALERT] Log Anomaly Detected"
     body=f"""
-        Anomaly detected in system logs
-        time window: {anomaly['timestamp']}
-        Error count: {anomaly['error_count']}
-        Z score: {anomaly['z_score']}
-        Please review log data.
+        ⚠️ Automated System Alert: Log Anomaly Detected
 
-        Regards,
-        Rohan Belsare.
-"""
+    An unusual spike in system errors has been identified by the monitoring script.
+
+    --- Details ---
+    Timestamp Window : {anomaly['timestamp']}
+    Error Count      : {anomaly['error_count']}
+    Z-Score          : {anomaly['z_score']}
+
+    --- Action Required ---
+    Please review the log management dashboard or SSH into the production server 
+    to investigate the root cause.
+
+    This is an automated message.
+    Regards,
+    Rohan Belsare
+    """
     msg=EmailMessage()
     msg["subject"]=subject
     msg["from"]=EMAIL
